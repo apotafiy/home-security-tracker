@@ -1,7 +1,7 @@
 {
-  "name": "node-js-getting-started",
+  "name": "home-security-tracker",
   "version": "0.3.0",
-  "description": "A sample Node.js app using Express 4",
+  "description": "Charting Amazon Ring security camera motion detection.",
   "engines": {
     "node": "14.x"
   },
@@ -12,7 +12,6 @@
     "dev": "nodemon index.js"
   },
   "dependencies": {
-    "cool-ascii-faces": "^1.3.4",
     "date-and-time": "^2.0.0",
     "ejs": "^3.1.5",
     "express": "^4.15.2",
@@ -27,12 +26,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/heroku/node-js-getting-started"
+    "url": "https://github.com/apotafiy/home-security-tracker"
   },
   "keywords": [
     "node",
     "heroku",
     "express"
-  ],
-  "license": "MIT"
+  ]
 }

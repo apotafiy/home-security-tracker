@@ -2,12 +2,8 @@
 <html>
 <head>
   <%- include ("../partials/header.ejs") %>
-
 </head>
-
 <body>
- 
-
 <div class="container">
 <h2>Database Results</h2>
 <ul>
@@ -15,8 +11,6 @@
         <li><%= r.id %> - <%= r.week_day %> - <%= r.month_date %> - <%= r.month %> - <%= r.year %> - <%= r.time %> - <%= r.doorbot_description	 %> - <%= r.kind %> - <%= r.detection_type %></li>
     <% }); %>
 </ul>
-
 </div>
-
 </body>
 </html>

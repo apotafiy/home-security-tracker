@@ -3,27 +3,19 @@
 <head>
   <%- include ("../partials/header.ejs") %>
   <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
-
 </head>
-
 <body>
   <div class="container">
     Basic stats
   </div>
-  
 <div class="container">
   <canvas id="dailyChart"></canvas>
 </div>
-
 <div class="container">
-
   <canvas id="hourlyChart"></canvas>
 </div>
-
 <div class="container">
-
   <canvas id="weeklyChart"></canvas>
-
 </div>
 <script type="text/javascript">
 const RING_BLUE_SOLID = "rgb(25,152,213,1)";
@@ -68,7 +60,6 @@ async function getAllData() {
     console.error(err);
   }
 }
-
 function motionsToHourly(motions) {
   const hours = [];
   for (let i = 0; i < 24; i++) {
