@@ -45,7 +45,7 @@ function DingData(ding) {
   };
 }
 
-async function addToCSV() {
+async function addToDB() {
   try {
     const cameras = await ringApi.getCameras();
     const frontCam = cameras[1];
@@ -62,10 +62,13 @@ async function addToCSV() {
           Detection_Type,
         } = DingData(ding);
         const client = await pool.connect();
-        // heroku has a row limit so i delete the oldest entry to make room for fresh data
-        await client.query(
-          "DELETE FROM dings WHERE id = (SELECT MIN(id) FROM dings);"
-        );
+        const rowCount = await client.query("SELECT COUNT(*) FROM dings;");
+        if (parseInt(rowCount.rows[0].count) >= 7000) {
+          // heroku has a row limit so i delete the oldest entry to make room for fresh data
+          await client.query(
+            "DELETE FROM dings WHERE id = (SELECT MIN(id) FROM dings);"
+          );
+        }
 
         await client.query(
           `INSERT INTO dings (week_day, month_date, month, year, time, doorbot_description, kind, detection_type) values ($1, $2, $3, $4, $5, $6, $7, $8);`,
@@ -92,4 +95,4 @@ async function addToCSV() {
   }
 }
 
-module.exports = addToCSV;
+module.exports = addToDB;

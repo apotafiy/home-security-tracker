@@ -2,12 +2,17 @@
 <html>
 <head>
   <%- include ("../partials/header.ejs") %>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="container">
-    Basic stats
+    <div id="About"><h2>About</h2></div>
+  <div class="box-container">
+    <div class="container">Most Recent Detection: </div>
+    <div id="total">Total motions detected: </div>
+    <div id="total-human">Total humans detected: </div>
   </div>
+</div>
 <div class="container">
   <canvas id="dailyChart"></canvas>
 </div>
@@ -20,6 +25,9 @@
 <script type="text/javascript">
 const RING_BLUE_SOLID = "rgb(25,152,213,1)";
 const RING_BLUE_TRAN = "rgb(25,152,213,0.5)";
+const PRUSSIAN_BLUE = 'rgb(19,49,92,0.5)';
+const GOLD_CRAYOLA = 'rgb(236,186,130)';
+const BRICK_RED = 'rgb(195,60,84)';
 let DAYS = 50;
 let WEEK_MULT = 7 / DAYS;
 let HOUR_MULT = 1 / DAYS;
@@ -51,8 +59,8 @@ function monthToInt(month) {
 async function getAllData() {
   try {
     // theres gotta be a better way to switch between local and remote
-    //const url = "http://localhost:5000/api/db";
-    const url = "https://home-security-tracker.herokuapp.com/api/db"
+    const url = "http://localhost:5000/api/db";
+    //const url = "https://home-security-tracker.herokuapp.com/api/db"
     const fetched = await fetch(url);
     const data = await fetched.json();
     return data.results;
@@ -197,7 +205,13 @@ async function createHourly(motions) {
           y: {
             beginAtZero: true,
           },
+          
         },
+        elements: {
+            line: {
+              tension: 0.5,
+            }
+        }
       },
     });
   } catch (err) {
@@ -247,6 +261,7 @@ async function createDaily(motions) {
   try {
     const days = motionsToDay(motions);
     const data = {};
+    const humanData = {};
     for (const prop in days) {
       const day = days[prop];
       const motion = day[0];
@@ -256,18 +271,31 @@ async function createDaily(motions) {
       if (!data[key]) {
         const displayDate = `${motion.month} ${motion.month_date} ${motion.year}`;
         data[displayDate] = day.length;
+        humanData[displayDate] = day.reduce((acc,curr)=>{
+          if(curr.detection_type =='human'){
+            return acc + 1;
+          } else return acc;
+        },0)
       }
     }
+  
     const ctx = document.getElementById("dailyChart").getContext("2d");
     const myChart = new Chart(ctx, {
       type: "bar",
       data: {
         datasets: [
           {
-            label: "Daily Total Motion Detections",
+            label: "Daily Motions Detected",
             data: data,
             backgroundColor: [RING_BLUE_TRAN],
             borderColor: [RING_BLUE_SOLID],
+            borderWidth: 3,
+          },
+          {
+            label: "Total Humans Detected",
+            data: humanData,
+            backgroundColor: [GOLD_CRAYOLA],
+            borderColor: [GOLD_CRAYOLA],
             borderWidth: 3,
           },
         ],
@@ -278,6 +306,7 @@ async function createDaily(motions) {
             beginAtZero: true,
           },
         },
+        
       },
     });
   } catch (err) {
@@ -289,6 +318,8 @@ async function createCharts() {
   try {
     const motions = await getAllData();
     await createDaily(motions);// this should go first because it sets the DAYS variable
+    // createDailyHuman(motions.filter)
+    // filter for human detected motion.detection_type
     createHourly(motions);
     createWeekly(motions);
   } catch (err) {
