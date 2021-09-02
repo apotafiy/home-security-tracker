@@ -8,7 +8,7 @@
   <div class="container">
     <div id="About"><h2>About</h2></div>
   <div class="box-container">
-    <div class="container">Most Recent Detection: </div>
+    <div class="container" id="recent">Most Recent Detection: </div>
     <div id="total">Total motions detected: </div>
     <div id="total-human">Total humans detected: </div>
   </div>
@@ -59,8 +59,8 @@ function monthToInt(month) {
 async function getAllData() {
   try {
     // theres gotta be a better way to switch between local and remote
-    //const url = "http://localhost:5000/api/db";
-    const url = "https://home-security-tracker.herokuapp.com/api/db"
+    const url = "http://localhost:5000/api/db";
+    //const url = "https://home-security-tracker.herokuapp.com/api/db"
     const fetched = await fetch(url);
     const data = await fetched.json();
     return data.results;
@@ -331,8 +331,20 @@ async function createCharts() {
   try {
     const motions = await getAllData();
     await createDaily(motions);// this should go first because it sets the DAYS variable
-    // createDailyHuman(motions.filter)
-    // filter for human detected motion.detection_type
+    const totalMotions = document.getElementById('total');
+    const totalHumans = document.getElementById('total-human');
+    const mostRecent = document.getElementById('recent');
+    totalMotions.innerText = `Total Motions Detected: ${motions.length}`;
+    totalHumans.innerText = `Total Humands Detected: ${motions.reduce((acc,curr)=>{
+      if(curr.detection_type =='human'){
+        return acc + 1;
+      }
+      return acc;
+    },0)}`
+    const last = motions[motions.length - 1]
+    mostRecent.innerText = `Most Recent Motion Detected: ${last.month} ${last.month_date} at ${last.time} (pst)`
+    
+
     createHourly(motions);
     createWeekly(motions);
   } catch (err) {
