@@ -31,8 +31,12 @@ express()
       res.send("Error " + err);
     }
   })
-  .listen(PORT, () => {
-    console.log(`Listening on ${PORT}`);
-    ring();
-    keepAlive();
+  .listen(PORT, async () => {
+    try {
+      console.log(`Listening on ${PORT}`);
+      ring();
+      keepAlive();
+    } catch (err) {
+      console.error(err);
+    }
   });
