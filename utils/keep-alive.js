@@ -3,7 +3,7 @@ const dateAPI = require("date-and-time");
 // heroku time is 7 hours ahead. probably 'utc'
 function httpCall() {
   const options = {
-    host: "cryptic-everglades-71792.herokuapp.com",
+    host: "home-security-tracker.herokuapp.com",
     port: 80,
     //host: "localhost",
     //port: 5000,
