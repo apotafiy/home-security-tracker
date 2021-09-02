@@ -296,7 +296,9 @@ async function createCharts() {
   }
 }
 
-createCharts();
+createCharts().then(res=>{
+  console.log('Charts created.')
+}).catch(console.error);
 
 // add section for average motions per, hour, per day, per week, and per month
 // total motions. what portion of motions had human detection
