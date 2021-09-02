@@ -176,13 +176,17 @@ async function createHourly(motions) {
       "11pm",
     ];
     const data = [];
+    const humanData = [];
     hours.forEach((hour, i) => {
-      // optionaly do average rather than total
-      // will need to find the total amount of days that have passes
-      // then divide hour.length by that value
-      // data[i] = hour.length/totalDays;
+      humanData[i] = hour.reduce((acc,curr)=>{
+        if(curr.detection_type == 'human'){
+          return acc+1;
+        }
+        return acc;
+      },0) * HOUR_MULT;
       data[i] = hour.length * HOUR_MULT;
     });
+    
 
     const ctx = document.getElementById("hourlyChart").getContext("2d");
     const myChart = new Chart(ctx, {
@@ -190,8 +194,17 @@ async function createHourly(motions) {
       data: {
         labels: labels,
         datasets: [
+          
           {
-            label: "Average Hourly Motion Detections",
+            label: "Average Hourly Humans Detected",
+            data: humanData,
+            fill: true,
+            backgroundColor: ['rgb(236,186,130,0.7)'],
+            borderColor: [GOLD_CRAYOLA],
+            borderWidth: 3,
+          },
+          {
+            label: "Average Hourly Motions Detected",
             data: data,
             fill: true,
             backgroundColor: [RING_BLUE_TRAN],
@@ -292,7 +305,7 @@ async function createDaily(motions) {
             borderWidth: 3,
           },
           {
-            label: "Total Humans Detected",
+            label: "Daily Humans Detected",
             data: humanData,
             backgroundColor: [GOLD_CRAYOLA],
             borderColor: [GOLD_CRAYOLA],
