@@ -1,3 +1,7 @@
+body {
+  font-family: "Roboto", sans-serif;
+  padding: 16px;
+}
 .jumbotron {
   background: #532f8c;
   color: white;
@@ -39,4 +43,51 @@
   padding: 26px;
   margin-bottom: 16px;
   margin-top: 16px;
+  width: 80vw;
+}
+
+.sub-container {
+  padding: 24px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgb(200, 200, 200);
+  border-radius: 8px;
+  background-color: rgb(235, 235, 235);
+  width: 100%;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 49% 50%;
+  width: 80vw;
+  margin-bottom: 16px;
+  margin-top: 16px;
+  margin: 0 auto;
+  grid-column-gap: 1%;
+}
+
+.stat {
+  margin-top: 4px;
+}
+
+.sub-grid {
+  display: grid;
+  grid-template-columns: 49% 50%;
+  align-self: baseline;
+  grid-column-gap: 1%;
+  margin-top: 5%;
+}
+
+h2 {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  margin-top: 4px;
+}
+
+#fill {
+  height: 50%;
+}
+
+#recent {
+  font-size: x-large;
 }

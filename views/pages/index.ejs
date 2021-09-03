@@ -1,367 +1,390 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <%- include ("../partials/header.ejs") %>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-  <div class="container">
-    <div id="About"><h2>About</h2></div>
-  <div class="box-container">
-    <div class="container" id="recent">Most Recent Detection: </div>
-    <div id="total">Total motions detected: </div>
-    <div id="total-human">Total humans detected: </div>
-  </div>
-</div>
-<div class="container">
-  <canvas id="dailyChart"></canvas>
-</div>
-<div class="container">
-  <canvas id="hourlyChart"></canvas>
-</div>
-<div class="container">
-  <canvas id="weeklyChart"></canvas>
-</div>
-<script type="text/javascript">
-const RING_BLUE_SOLID = "rgb(25,152,213,1)";
-const RING_BLUE_TRAN = "rgb(25,152,213,0.5)";
-const PRUSSIAN_BLUE = 'rgb(19,49,92,0.5)';
-const GOLD_CRAYOLA = 'rgb(236,186,130)';
-const BRICK_RED = 'rgb(195,60,84)';
-let DAYS = 50;
-let WEEK_MULT = 7 / DAYS;
-let HOUR_MULT = 1 / DAYS;
+  <head>
+    <%- include ("../partials/header.ejs") %>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="grid">
+      <div class="sub-container" id="About">
+        <h2>About</h2>
+        Stuff explaining what this project does. Tracking of about the last 2.5
+        months of motion at my front door. Lorem ipsum dolor sit amet
+        consectetur adipisicing elit. Facere eum ratione error laborum hic
+        perferendis tenetur perspiciatis doloribus nobis magnam. Lorem ipsum
+        dolor sit amet consectetur adipisicing elit. Suscipit quam iste placeat
+        nostrum pariatur. Natus amet omnis sint doloremque consequuntur. Lorem
+        ipsum dolor sit amet consectetur adipisicing elit?
+      </div>
 
-function monthToInt(month) {
-  let val = 1; // Jan will be default month
-  const months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-  months.forEach((elem, i) => {
-    if (elem == month) {
-      val = i + 1;
-    }
-  });
-  return val;
-}
+      <div class="sub-container">
+        <div class="sub-container">
+          Most Recent Detection:
+          <em class="stat" id="recent"></em>
+        </div>
+        <div id="fill">
+          <div class="sub-grid">
+            <div>
+              Total motions detected:
+              <h2 class="stat" id="total"></h2>
+            </div>
+            <div>
+              Total humans detected:
+              <h2 class="stat" id="total-human"></h2>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <canvas id="dailyChart"></canvas>
+    </div>
+    <div class="container">
+      <canvas id="hourlyChart"></canvas>
+    </div>
+    <div class="container">
+      <canvas id="weeklyChart"></canvas>
+    </div>
+    <script type="text/javascript">
+      const RING_BLUE_SOLID = "rgb(25,152,213,1)";
+      const RING_BLUE_TRAN = "rgb(25,152,213,0.5)";
+      const PRUSSIAN_BLUE = "rgb(19,49,92,0.5)";
+      const GOLD_CRAYOLA_SOLID = "rgb(236,186,130)";
+      const GOLD_CRAYOLA_TRAN = "rgb(236,186,130,0.7)";
+      const BRICK_RED = "rgb(195,60,84)";
+      let DAYS = 50;
+      let WEEK_MULT = 7 / DAYS;
+      let HOUR_MULT = 1 / DAYS;
 
-async function getAllData() {
-  try {
-    // theres gotta be a better way to switch between local and remote
-    //const url = "http://localhost:5000/api/db";
-    const url = "https://home-security-tracker.herokuapp.com/api/db"
-    const fetched = await fetch(url);
-    const data = await fetched.json();
-    return data.results;
-  } catch (err) {
-    console.error(err);
-  }
-}
-function motionsToHourly(motions) {
-  const hours = [];
-  for (let i = 0; i < 24; i++) {
-    hours.push([]);
-  }
-  motions.forEach((motion) => {
-    hours[parseInt(motion.time.substring(0, 2))].push(motion);
-  });
-  return hours;
-}
-
-function motionsToWeekday(motions) {
-  const week = {
-    Sun: [],
-    Mon: [],
-    Tue: [],
-    Wed: [],
-    Thu: [],
-    Fri: [],
-    Sat: [],
-  };
-  motions.forEach((motion) => {
-    week[motion.week_day].push(motion);
-  });
-  return week;
-}
-
-function motionsToMonth(motions) {
-  const months = {
-    Jan: [], // some of these month abreviations may be wrong. double check them.
-    Feb: [],
-    Mar: [],
-    Apr: [],
-    May: [],
-    Jun: [],
-    Jul: [],
-    Aug: [],
-    Sep: [],
-    Oct: [],
-    Nov: [],
-    Dec: [],
-  };
-  motions.forEach((motion) => {
-    months[motion.month].push(motion);
-  });
-  return months;
-}
-
-function motionsToYear(motions) {
-  const years = {};
-  motions.forEach((motion) => {
-    if (years[motion.year]) {
-      years[motion.year].push(motion);
-    } else {
-      years[motion.year] = [motion];
-    }
-  });
-  return years;
-}
-
-function motionsToDay(motions) {
-  const days = {};
-  motions.forEach((motion) => {
-    const key = `${motion.year} ${monthToInt(motion.month)} ${
-      motion.month_date
-    }`;
-    if (!days[key]) {
-      days[key] = [motion];
-    } else {
-      days[key].push(motion);
-    }
-  });
-  DAYS = Object.keys(days).length;
-  WEEK_MULT = 7 / DAYS;
-  HOUR_MULT = 1 / DAYS;
-  return days;
-}
-
-async function createHourly(motions) {
-  try {
-    const hours = motionsToHourly(motions);
-    const labels = [
-      "12am",
-      "1am",
-      "2am",
-      "3am",
-      "4am",
-      "5am",
-      "6am",
-      "7am",
-      "8am",
-      "9am",
-      "10am",
-      "11am",
-      "12pm",
-      "1pm",
-      "2pm",
-      "3pm",
-      "4pm",
-      "5pm",
-      "6pm",
-      "7pm",
-      "8pm",
-      "9pm",
-      "10pm",
-      "11pm",
-    ];
-    const data = [];
-    const humanData = [];
-    hours.forEach((hour, i) => {
-      humanData[i] = hour.reduce((acc,curr)=>{
-        if(curr.detection_type == 'human'){
-          return acc+1;
+      async function getAllData() {
+        try {
+          // theres gotta be a better way to switch between local and remote
+          //const url = "http://localhost:5000/api/db";
+          const url = "https://home-security-tracker.herokuapp.com/api/db";
+          const fetched = await fetch(url);
+          const data = await fetched.json();
+          return data.results;
+        } catch (err) {
+          console.error(err);
         }
-        return acc;
-      },0) * HOUR_MULT;
-      data[i] = hour.length * HOUR_MULT;
-    });
-    
+      }
+      function monthToInt(month) {
+        let val = 1; // Jan will be default month
+        const months = [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec",
+        ];
+        months.forEach((elem, i) => {
+          if (elem == month) {
+            val = i + 1;
+          }
+        });
+        return val;
+      }
 
-    const ctx = document.getElementById("hourlyChart").getContext("2d");
-    const myChart = new Chart(ctx, {
-      type: "line",
-      data: {
-        labels: labels,
-        datasets: [
-          
-          {
-            label: "Average Hourly Humans Detected",
-            data: humanData,
-            fill: true,
-            backgroundColor: ['rgb(236,186,130,0.7)'],
-            borderColor: [GOLD_CRAYOLA],
-            borderWidth: 3,
-          },
-          {
-            label: "Average Hourly Motions Detected",
-            data: data,
-            fill: true,
-            backgroundColor: [RING_BLUE_TRAN],
-            borderColor: [RING_BLUE_SOLID],
-            borderWidth: 3,
-          },
-        ],
-      },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true,
-          },
-          
-        },
-        elements: {
-            line: {
-              tension: 0.5,
+      function motionsToHourly(motions) {
+        const hours = [];
+        for (let i = 0; i < 24; i++) {
+          hours.push([]);
+        }
+        motions.forEach((motion) => {
+          hours[parseInt(motion.time.substring(0, 2))].push(motion);
+        });
+        return hours;
+      }
+
+      function motionsToWeekday(motions) {
+        const week = {
+          Sun: [],
+          Mon: [],
+          Tue: [],
+          Wed: [],
+          Thu: [],
+          Fri: [],
+          Sat: [],
+        };
+        motions.forEach((motion) => {
+          week[motion.week_day].push(motion);
+        });
+        return week;
+      }
+
+      function motionsToMonth(motions) {
+        const months = {
+          Jan: [], // some of these month abreviations may be wrong. double check them.
+          Feb: [],
+          Mar: [],
+          Apr: [],
+          May: [],
+          Jun: [],
+          Jul: [],
+          Aug: [],
+          Sep: [],
+          Oct: [],
+          Nov: [],
+          Dec: [],
+        };
+        motions.forEach((motion) => {
+          months[motion.month].push(motion);
+        });
+        return months;
+      }
+
+      function motionsToYear(motions) {
+        const years = {};
+        motions.forEach((motion) => {
+          if (years[motion.year]) {
+            years[motion.year].push(motion);
+          } else {
+            years[motion.year] = [motion];
+          }
+        });
+        return years;
+      }
+
+      function motionsToDay(motions) {
+        const days = {};
+        motions.forEach((motion) => {
+          const key = `${motion.year} ${monthToInt(motion.month)} ${
+            motion.month_date
+          }`;
+          if (!days[key]) {
+            days[key] = [motion];
+          } else {
+            days[key].push(motion);
+          }
+        });
+        DAYS = Object.keys(days).length;
+        WEEK_MULT = 7 / DAYS;
+        HOUR_MULT = 1 / DAYS;
+        return days;
+      }
+
+      async function createHourly(motions) {
+        try {
+          const hours = motionsToHourly(motions);
+          const labels = [
+            "12am",
+            "1am",
+            "2am",
+            "3am",
+            "4am",
+            "5am",
+            "6am",
+            "7am",
+            "8am",
+            "9am",
+            "10am",
+            "11am",
+            "12pm",
+            "1pm",
+            "2pm",
+            "3pm",
+            "4pm",
+            "5pm",
+            "6pm",
+            "7pm",
+            "8pm",
+            "9pm",
+            "10pm",
+            "11pm",
+          ];
+          const data = [];
+          const humanData = [];
+          hours.forEach((hour, i) => {
+            humanData[i] =
+              hour.reduce((acc, curr) => {
+                if (curr.detection_type == "human") {
+                  return acc + 1;
+                }
+                return acc;
+              }, 0) * HOUR_MULT;
+            data[i] = hour.length * HOUR_MULT;
+          });
+
+          const ctx = document.getElementById("hourlyChart").getContext("2d");
+          const myChart = new Chart(ctx, {
+            type: "line",
+            data: {
+              labels: labels,
+              datasets: [
+                {
+                  label: "Average Hourly Humans Detected",
+                  data: humanData,
+                  fill: true,
+                  backgroundColor: [GOLD_CRAYOLA_TRAN],
+                  borderColor: [GOLD_CRAYOLA_SOLID],
+                  borderWidth: 3,
+                },
+                {
+                  label: "Average Hourly Motions Detected",
+                  data: data,
+                  fill: true,
+                  backgroundColor: [RING_BLUE_TRAN],
+                  borderColor: [RING_BLUE_SOLID],
+                  borderWidth: 3,
+                },
+              ],
+            },
+            options: {
+              scales: {
+                y: {
+                  beginAtZero: true,
+                },
+              },
+              elements: {
+                line: {
+                  tension: 0.5,
+                },
+              },
+            },
+          });
+        } catch (err) {
+          console.error(err);
+        }
+      }
+      async function createWeekly(motions) {
+        try {
+          const { Sun, Mon, Tue, Wed, Thu, Fri, Sat } =
+            motionsToWeekday(motions);
+          const data = {
+            Sunday: Sun.length * WEEK_MULT,
+            Monday: Mon.length * WEEK_MULT,
+            Tuesday: Tue.length * WEEK_MULT,
+            Wednesday: Wed.length * WEEK_MULT,
+            Thursday: Thu.length * WEEK_MULT,
+            Friday: Fri.length * WEEK_MULT,
+            Saturday: Sat.length * WEEK_MULT,
+          };
+
+          const ctx = document.getElementById("weeklyChart").getContext("2d");
+          const myChart = new Chart(ctx, {
+            type: "bar",
+            data: {
+              datasets: [
+                {
+                  label: "Average Weekly Motion Detections",
+                  data: data,
+                  backgroundColor: [RING_BLUE_TRAN],
+                  borderColor: [RING_BLUE_SOLID],
+                  borderWidth: 3,
+                },
+              ],
+            },
+            options: {
+              scales: {
+                y: {
+                  beginAtZero: true,
+                },
+              },
+            },
+          });
+        } catch (err) {
+          console.error(err);
+        }
+      }
+      async function createDaily(motions) {
+        try {
+          const days = motionsToDay(motions);
+          const data = {};
+          const humanData = {};
+          for (const prop in days) {
+            const day = days[prop];
+            const motion = day[0];
+            const key = `${motion.year} ${monthToInt(motion.month)} ${
+              motion.month_date
+            }`;
+            if (!data[key]) {
+              const displayDate = `${motion.month} ${motion.month_date} ${motion.year}`;
+              data[displayDate] = day.length;
+              humanData[displayDate] = day.reduce((acc, curr) => {
+                if (curr.detection_type == "human") {
+                  return acc + 1;
+                } else return acc;
+              }, 0);
             }
+          }
+
+          const ctx = document.getElementById("dailyChart").getContext("2d");
+          const myChart = new Chart(ctx, {
+            type: "bar",
+            data: {
+              datasets: [
+                {
+                  label: "Daily Motions Detected",
+                  data: data,
+                  backgroundColor: [RING_BLUE_TRAN],
+                  borderColor: [RING_BLUE_SOLID],
+                  borderWidth: 3,
+                },
+                {
+                  label: "Daily Humans Detected",
+                  data: humanData,
+                  backgroundColor: [GOLD_CRAYOLA_TRAN],
+                  borderColor: [GOLD_CRAYOLA_SOLID],
+                  borderWidth: 3,
+                },
+              ],
+            },
+            options: {
+              scales: {
+                y: {
+                  beginAtZero: true,
+                },
+              },
+            },
+          });
+        } catch (err) {
+          console.error(err);
         }
-      },
-    });
-  } catch (err) {
-    console.error(err);
-  }
-}
-async function createWeekly(motions) {
-  try {
-    const { Sun, Mon, Tue, Wed, Thu, Fri, Sat } = motionsToWeekday(motions);
-    const data = {
-      Sunday: Sun.length * WEEK_MULT,
-      Monday: Mon.length * WEEK_MULT,
-      Tuesday: Tue.length * WEEK_MULT,
-      Wednesday: Wed.length * WEEK_MULT,
-      Thursday: Thu.length * WEEK_MULT,
-      Friday: Fri.length * WEEK_MULT,
-      Saturday: Sat.length * WEEK_MULT,
-    };
-
-    const ctx = document.getElementById("weeklyChart").getContext("2d");
-    const myChart = new Chart(ctx, {
-      type: "bar",
-      data: {
-        datasets: [
-          {
-            label: "Average Weekly Motion Detections",
-            data: data,
-            backgroundColor: [RING_BLUE_TRAN],
-            borderColor: [RING_BLUE_SOLID],
-            borderWidth: 3,
-          },
-        ],
-      },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true,
-          },
-        },
-      },
-    });
-  } catch (err) {
-    console.error(err);
-  }
-}
-async function createDaily(motions) {
-  try {
-    const days = motionsToDay(motions);
-    const data = {};
-    const humanData = {};
-    for (const prop in days) {
-      const day = days[prop];
-      const motion = day[0];
-      const key = `${motion.year} ${monthToInt(motion.month)} ${
-        motion.month_date
-      }`;
-      if (!data[key]) {
-        const displayDate = `${motion.month} ${motion.month_date} ${motion.year}`;
-        data[displayDate] = day.length;
-        humanData[displayDate] = day.reduce((acc,curr)=>{
-          if(curr.detection_type =='human'){
-            return acc + 1;
-          } else return acc;
-        },0)
       }
-    }
-  
-    const ctx = document.getElementById("dailyChart").getContext("2d");
-    const myChart = new Chart(ctx, {
-      type: "bar",
-      data: {
-        datasets: [
-          {
-            label: "Daily Motions Detected",
-            data: data,
-            backgroundColor: [RING_BLUE_TRAN],
-            borderColor: [RING_BLUE_SOLID],
-            borderWidth: 3,
-          },
-          {
-            label: "Daily Humans Detected",
-            data: humanData,
-            backgroundColor: [GOLD_CRAYOLA],
-            borderColor: [GOLD_CRAYOLA],
-            borderWidth: 3,
-          },
-        ],
-      },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true,
-          },
-        },
-        
-      },
-    });
-  } catch (err) {
-    console.error(err);
-  }
-}
 
-async function createCharts() {
-  try {
-    const motions = await getAllData();
-    await createDaily(motions);// this should go first because it sets the DAYS variable
-    const totalMotions = document.getElementById('total');
-    const totalHumans = document.getElementById('total-human');
-    const mostRecent = document.getElementById('recent');
-    totalMotions.innerText = `Total Motions Detected: ${motions.length}`;
-    totalHumans.innerText = `Total Humands Detected: ${motions.reduce((acc,curr)=>{
-      if(curr.detection_type =='human'){
-        return acc + 1;
+      async function createCharts() {
+        try {
+          const motions = await getAllData();
+          await createDaily(motions); // this should go first because it sets the DAYS variable
+          const totalMotions = document.getElementById("total");
+          const totalHumans = document.getElementById("total-human");
+          const mostRecent = document.getElementById("recent");
+          totalMotions.innerText = ` ${motions.length}`;
+          totalHumans.innerText = ` ${motions.reduce((acc, curr) => {
+            if (curr.detection_type == "human") {
+              return acc + 1;
+            }
+            return acc;
+          }, 0)}`;
+          const last = motions[motions.length - 1];
+          mostRecent.innerText = ` ${last.month} ${last.month_date} at ${last.time} (pst)`;
+
+          createHourly(motions);
+          createWeekly(motions);
+        } catch (err) {
+          console.error(err);
+        }
       }
-      return acc;
-    },0)}`
-    const last = motions[motions.length - 1]
-    mostRecent.innerText = `Most Recent Motion Detected: ${last.month} ${last.month_date} at ${last.time} (pst)`
-    
 
-    createHourly(motions);
-    createWeekly(motions);
-  } catch (err) {
-    console.error(err);
-  }
-}
+      createCharts()
+        .then((res) => {
+          console.log("Charts created.");
+        })
+        .catch(console.error);
 
-createCharts().then(res=>{
-  console.log('Charts created.')
-}).catch(console.error);
-
-// add section for average motions per, hour, per day, per week, and per month
-// total motions. what portion of motions had human detection
-// maybe have a seperate chart just for human detected motion or make a button that changes from all motion to
-// just human motion. accompanied by a color change
-// total motion vs human motion
-
-</script>
-</body>
+      // add section for average motions per, hour, per day, per week, and per month
+      // search for hourly chart of a day
+    </script>
+  </body>
 </html>
