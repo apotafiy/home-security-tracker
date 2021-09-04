@@ -9,32 +9,37 @@
     />
   </head>
   <body>
-    <div class="grid">
-      <div class="sub-container" id="About">
-        <h2>About</h2>
-        Stuff explaining what this project does. Tracking of about the last 2.5
-        months of motion at my front door. Lorem ipsum dolor sit amet
-        consectetur adipisicing elit. Facere eum ratione error laborum hic
-        perferendis tenetur perspiciatis doloribus nobis magnam. Lorem ipsum
-        dolor sit amet consectetur adipisicing elit. Suscipit quam iste placeat
-        nostrum pariatur. Natus amet omnis sint doloremque consequuntur. Lorem
-        ipsum dolor sit amet consectetur adipisicing elit?
-      </div>
-
-      <div class="sub-container">
-        <div class="sub-container">
-          Most Recent Detection:
-          <em class="stat" id="recent"></em>
+    <div class="home-background">
+      <div class="grid">
+        <div class="sub-container" id="About">
+          <h2>About</h2>
+          <p>
+            For the past several months I have documented every motion at my
+            front door. My Amazon Ring security cameras have motion sensors that
+            detect every motion at my front door. Once motion is detected, using
+            the Ring API, I subsequently enter the data into my database.
+            Analyzing the data I found a few trends and plotted them on this
+            website. Pls hire me. Lorem ipsum dolor sit amet consectetur
+            adipisicing elit. Facere eum ratione error laborum hic perferendis
+            tenetur perspiciatis doloribus nobis magnam?
+          </p>
         </div>
-        <div id="fill">
+
+        <div class="sub-container">
+          <div class="sub-container">
+            <p>
+              Most Recent Detection:&emsp;
+              <em class="stat" id="recent"></em>
+            </p>
+          </div>
           <div class="sub-grid">
-            <div>
-              Total motions detected:
-              <h2 class="stat" id="total"></h2>
+            <div class="stat-field">
+              <p>Total motions detected:</p>
+              <em class="stat" id="total"></em>
             </div>
-            <div>
-              Total humans detected:
-              <h2 class="stat" id="total-human"></h2>
+            <div class="stat-field">
+              <p>Total humans detected:</p>
+              <em class="stat" id="total-human"></em>
             </div>
           </div>
         </div>
@@ -49,6 +54,7 @@
     <div class="container">
       <canvas id="weeklyChart"></canvas>
     </div>
+    <div class="spacer-top"></div>
     <script type="text/javascript">
       const RING_BLUE_SOLID = "rgb(25,152,213,1)";
       const RING_BLUE_TRAN = "rgb(25,152,213,0.5)";
@@ -63,8 +69,8 @@
       async function getAllData() {
         try {
           // theres gotta be a better way to switch between local and remote
-          //const url = "http://localhost:5000/api/db";
-          const url = "https://home-security-tracker.herokuapp.com/api/db";
+          const url = "http://localhost:5000/api/db";
+          //const url = "https://home-security-tracker.herokuapp.com/api/db";
           const fetched = await fetch(url);
           const data = await fetched.json();
           return data.results;
@@ -356,20 +362,27 @@
       async function createCharts() {
         try {
           const motions = await getAllData();
+          Chart.defaults.font.weight = "bold";
+
           await createDaily(motions); // this should go first because it sets the DAYS variable
           const totalMotions = document.getElementById("total");
           const totalHumans = document.getElementById("total-human");
           const mostRecent = document.getElementById("recent");
-          totalMotions.innerText = ` ${motions.length}`;
-          totalHumans.innerText = ` ${motions.reduce((acc, curr) => {
-            if (curr.detection_type == "human") {
-              return acc + 1;
-            }
-            return acc;
-          }, 0)}`;
+          totalMotions.innerText = ` ${motions.length.toLocaleString()}`;
+          totalHumans.innerText = ` ${motions
+            .reduce((acc, curr) => {
+              if (curr.detection_type == "human") {
+                return acc + 1;
+              }
+              return acc;
+            }, 0)
+            .toLocaleString()}`;
           const last = motions[motions.length - 1];
-          mostRecent.innerText = ` ${last.month} ${last.month_date} at ${last.time} (pst)`;
-
+          mostRecent.innerText = `${last.month} ${last.month_date} at ${last.time} (pst)`;
+          mostRecent.parentElement.parentElement.style.backgroundColor =
+            "rgb(200,200,200)";
+          mostRecent.parentElement.parentElement.style.boxShadow =
+            "box-shadow: -1rem -1rem -1rem lightgray;";
           createHourly(motions);
           createWeekly(motions);
         } catch (err) {

@@ -1,6 +1,6 @@
 body {
   font-family: "Roboto", sans-serif;
-  padding: 16px;
+  background-color: rgb(245, 245, 245);
 }
 .jumbotron {
   background: #532f8c;
@@ -35,15 +35,30 @@ body {
 .jumbotron .lang-logo img {
   max-width: 100%;
 }
+
+.home-background {
+  aspect-ratio: 960/540;
+  width: 100%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-image: url("../homelayer.svg");
+  background-position: center;
+  top: 0px;
+  background-attachment: fixed;
+  height: 100vh;
+  border-color: lightgray;
+}
+
 .container {
   border-width: 1px;
   border-style: solid;
   border-color: lightgrey;
   border-radius: 8px;
   padding: 26px;
-  margin-bottom: 16px;
-  margin-top: 16px;
+  margin-bottom: 32px;
+  margin-top: 32px;
   width: 80vw;
+  box-shadow: 1rem 1rem 1rem rgb(0, 0, 0, 0.25);
 }
 
 .sub-container {
@@ -52,8 +67,9 @@ body {
   border-style: solid;
   border-color: rgb(200, 200, 200);
   border-radius: 8px;
-  background-color: rgb(235, 235, 235);
+  background-color: rgb(245, 245, 245);
   width: 100%;
+  box-shadow: 1rem 1rem 1rem rgb(0, 0, 0, 0.25);
 }
 
 .grid {
@@ -68,6 +84,7 @@ body {
 
 .stat {
   margin-top: 4px;
+  font-size: xx-large;
 }
 
 .sub-grid {
@@ -75,7 +92,7 @@ body {
   grid-template-columns: 49% 50%;
   align-self: baseline;
   grid-column-gap: 1%;
-  margin-top: 5%;
+  padding: auto;
 }
 
 h2 {
@@ -84,10 +101,20 @@ h2 {
   margin-top: 4px;
 }
 
-#fill {
-  height: 50%;
+p {
+  font-size: large;
+}
+.stat-field {
+  margin: auto;
+  margin-top: 10%;
 }
 
-#recent {
-  font-size: x-large;
+.spacer-top {
+  aspect-ratio: 900/100;
+  width: 100%;
+  background-repeat: no-repeat;
+  position: relative;
+  bottom: 0px;
+  background-size: cover;
+  background-image: url("../spacertop.svg");
 }
