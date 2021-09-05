@@ -67,8 +67,8 @@
       async function getAllData() {
         try {
           // theres gotta be a better way to switch between local and remote
-          const url = "http://localhost:5000/api/db";
-          //const url = "https://home-security-tracker.herokuapp.com/api/db";
+          //const url = "http://localhost:5000/api/db";
+          const url = "https://home-security-tracker.herokuapp.com/api/db";
           const fetched = await fetch(url);
           const data = await fetched.json();
           return data.results;
