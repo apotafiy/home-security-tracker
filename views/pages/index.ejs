@@ -2,6 +2,8 @@
 <html>
   <head>
     <%- include ("../partials/header.ejs") %>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
@@ -65,8 +67,8 @@
       async function getAllData() {
         try {
           // theres gotta be a better way to switch between local and remote
-          //const url = "http://localhost:5000/api/db";
-          const url = "https://home-security-tracker.herokuapp.com/api/db";
+          const url = "http://localhost:5000/api/db";
+          //const url = "https://home-security-tracker.herokuapp.com/api/db";
           const fetched = await fetch(url);
           const data = await fetched.json();
           return data.results;
@@ -359,6 +361,7 @@
         try {
           const motions = await getAllData();
           Chart.defaults.font.weight = "bold";
+          Chart.defaults.font.size = 14;
 
           await createDaily(motions); // this should go first because it sets the DAYS variable
           const totalMotions = document.getElementById("total");

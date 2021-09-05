@@ -193,8 +193,14 @@ p {
   }
 }
 
-@media screen and (orientation: landscape) {
+@media (max-width: 812px) and (orientation: landscape) {
   .home-background {
-    height: 140vh;
+    height: 150vh;
+  }
+}
+
+@media (max-width: 600px) {
+  .home-background {
+    height: 150vh;
   }
 }
