@@ -109,7 +109,7 @@ h2 {
 }
 
 p {
-  font-size: large;
+  font-size: x-large;
 }
 .stat-field {
   margin: auto;
@@ -165,7 +165,10 @@ p {
 
 @media (min-width: 2560px) {
   p {
-    font-size: xx-large;
+    font-size: 1.5em;
+  }
+  h2 {
+    font-size: 1.75em;
   }
 }
 

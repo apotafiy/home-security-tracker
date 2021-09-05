@@ -361,7 +361,7 @@
         try {
           const motions = await getAllData();
           Chart.defaults.font.weight = "bold";
-          Chart.defaults.font.size = 14;
+          Chart.defaults.font.size = 13;
 
           await createDaily(motions); // this should go first because it sets the DAYS variable
           const totalMotions = document.getElementById("total");
