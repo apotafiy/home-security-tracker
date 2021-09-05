@@ -11,46 +11,43 @@
   <body>
     <div class="home-background">
       <div class="grid">
-        <div class="sub-container" id="About">
+        <div class="sub-container" id="about">
           <h2>About</h2>
           <p>
             For the past several months I have documented every motion at my
             front door. My Amazon Ring security cameras have motion sensors that
-            detect every motion at my front door. Once motion is detected, using
-            the Ring API, I subsequently enter the data into my database.
-            Analyzing the data I found a few trends and plotted them on this
-            website. Pls hire me. Lorem ipsum dolor sit amet consectetur
-            adipisicing elit. Facere eum ratione error laborum hic perferendis
-            tenetur perspiciatis doloribus nobis magnam?
+            detect every motion at my front door. Whenever motion is detected,
+            the data is subsequently enter the data into my database and
+            displayed on this website. Analyzing the data I found a few trends
+            and plotted them on graphs below.
           </p>
         </div>
 
-        <div class="sub-container">
-          <div class="sub-container">
+        <div id="dashboard" class="sub-container">
+          <div id="recent-container" class="sub-container">
             <p>
-              Most Recent Detection:&emsp;
+              <b>Live Update:</b>&ensp;Motion Detected at&ensp;-&ensp;
               <em class="stat" id="recent"></em>
             </p>
           </div>
-          <div class="sub-grid">
-            <div class="stat-field">
-              <p>Total motions detected:</p>
-              <em class="stat" id="total"></em>
-            </div>
-            <div class="stat-field">
-              <p>Total humans detected:</p>
-              <em class="stat" id="total-human"></em>
-            </div>
+          <div id="total-motions" class="stat-field">
+            <p>Total motions detected:</p>
+            <em class="stat" id="total"></em>
+          </div>
+          <div id="total-humans" class="stat-field">
+            <p>Total humans detected:</p>
+            <em class="stat" id="total-human"></em>
           </div>
         </div>
       </div>
     </div>
     <div class="container">
-      <canvas id="dailyChart"></canvas>
-    </div>
-    <div class="container">
       <canvas id="hourlyChart"></canvas>
     </div>
+    <div class="container">
+      <canvas id="dailyChart"></canvas>
+    </div>
+
     <div class="container">
       <canvas id="weeklyChart"></canvas>
     </div>
@@ -379,10 +376,7 @@
             .toLocaleString()}`;
           const last = motions[motions.length - 1];
           mostRecent.innerText = `${last.month} ${last.month_date} at ${last.time} (pst)`;
-          mostRecent.parentElement.parentElement.style.backgroundColor =
-            "rgb(200,200,200)";
-          mostRecent.parentElement.parentElement.style.boxShadow =
-            "box-shadow: -1rem -1rem -1rem lightgray;";
+
           createHourly(motions);
           createWeekly(motions);
         } catch (err) {
