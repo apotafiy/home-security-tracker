@@ -165,10 +165,10 @@ p {
 
 @media (min-width: 2560px) {
   p {
-    font-size: 1.5em;
+    font-size: 1.2em;
   }
   h2 {
-    font-size: 1.75em;
+    font-size: 1.5em;
   }
 }
 
@@ -187,6 +187,12 @@ p {
   }
 }
 
+@media (max-width: 1280px) {
+  .home-background {
+    height: 110vh;
+  }
+}
+
 @media (max-width: 768px) {
   #about {
     font-size: xx-large;
@@ -198,12 +204,12 @@ p {
 
 @media (max-width: 812px) and (orientation: landscape) {
   .home-background {
-    height: 150vh;
+    height: 170vh;
   }
 }
 
 @media (max-width: 600px) {
   .home-background {
-    height: 150vh;
+    height: 170vh;
   }
 }
