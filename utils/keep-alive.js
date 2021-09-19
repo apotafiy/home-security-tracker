@@ -25,6 +25,7 @@ function httpCall() {
 }
 function startKeepAlive() {
   httpCall();
+  console.log("Keep-alive Start!");
   const intervalID = setInterval(() => {
     const hour = dateAPI.addHours(new Date(), -7).getHours();
     console.log("Keep-alive Hour: ", hour);
