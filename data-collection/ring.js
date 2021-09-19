@@ -1,8 +1,8 @@
-"use strict";
-require("dotenv").config();
-const pool = require("../db/index.js");
-const dateAPI = require("date-and-time");
-const { RingApi } = require("ring-client-api");
+'use strict';
+require('dotenv').config();
+const pool = require('../db/index.js');
+const dateAPI = require('date-and-time');
+const { RingApi } = require('ring-client-api');
 const ringApi = new RingApi({
   refreshToken: process.env.RING_REFRESH_TOKEN,
   cameraStatusPollingSeconds: 20,
@@ -23,7 +23,7 @@ function DingData(ding) {
   const ring_ID = id;
   const date = dateAPI.addHours(new Date(), -7);
   // ['Thu', 'Jul', '01', '2021', '15:25:59', 'GMT-0700', '(Pacific', 'Daylight', 'Time)']
-  const dateArr = date.toString().split(" ");
+  const dateArr = date.toString().split(' ');
   const Week_Day = dateArr[0];
   const Month_Date = dateArr[2];
   const Month = dateArr[1];
@@ -62,11 +62,11 @@ async function addToDB() {
           Detection_Type,
         } = DingData(ding);
         const client = await pool.connect();
-        const rowCount = await client.query("SELECT COUNT(*) FROM dings;");
-        if (parseInt(rowCount.rows[0].count) >= 7000) {
+        const rowCount = await client.query('SELECT COUNT(*) FROM dings;');
+        if (parseInt(rowCount.rows[0].count) >= 7042) {
           // heroku has a row limit so i delete the oldest entry to make room for fresh data
           await client.query(
-            "DELETE FROM dings WHERE id = (SELECT MIN(id) FROM dings);"
+            'DELETE FROM dings WHERE id = (SELECT MIN(id) FROM dings);'
           );
         }
 
@@ -83,13 +83,13 @@ async function addToDB() {
             Detection_Type,
           ]
         );
-        console.log("Motion: ", Time);
+        console.log('Motion: ', Time);
         client.release();
       } catch (err) {
         console.error(err);
       }
     });
-    console.log("...Running");
+    console.log('...Running');
   } catch (err) {
     console.error(err);
   }
